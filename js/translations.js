@@ -28,7 +28,12 @@ export const translations = {
         posUnavail: 'Pos Unavail',
         timeout: 'Timeout',
         unknown: 'Unknown',
-        confirmDelete: 'Are you sure you want to delete this shortcut?'
+        confirmDelete: 'Are you sure you want to delete this shortcut?',
+        unsplashApiKey: 'Unsplash Access Key',
+        searchUnsplash: 'Search Unsplash',
+        photographerCredit: 'Photo by {name} on Unsplash',
+        noResults: 'No results found',
+        setApiKeyFirst: 'Please set your Unsplash Access Key first'
     },
     zh: {
         settings: '设置',

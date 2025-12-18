@@ -11,6 +11,10 @@
     "unlimitedStorage",
     "geolocation"
   ],
+  "host_permissions": [
+    "https://api.unsplash.com/*",
+    "https://images.unsplash.com/*"
+  ],
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

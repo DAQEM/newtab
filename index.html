@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Tab</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div id="app">
         <!-- Weather Widget -->
@@ -34,27 +36,40 @@
         </div>
 
         <div id="settings-trigger" title="Settings">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+            </svg>
         </div>
 
         <div id="shortcuts-container">
             <!-- Shortcuts will be injected here -->
             <button id="add-shortcut-btn" type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
             </button>
         </div>
+        <div id="pagination-dots"></div>
+
+        <div id="bg-attribution" class="attribution hidden"></div>
     </div>
 
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <h2 data-i18n="settings">Settings</h2>
-            
+
             <div class="setting-item">
-                 <label>Language</label>
-                 <select id="language-select">
-                     <!-- Languages injected by JS -->
-                 </select>
+                <label>Language</label>
+                <select id="language-select">
+                    <!-- Languages injected by JS -->
+                </select>
             </div>
 
             <div class="setting-item">
@@ -67,28 +82,42 @@
                     <label data-i18n="image">Image</label>
                     <input type="file" id="bg-image-upload" accept="image/*">
                     <button id="clear-bg-image" class="secondary hidden" data-i18n="removeImage">Remove Image</button>
+
+                    <div style="margin-top: 15px; border-top: 1px solid var(--input-border); padding-top: 15px;">
+                        <label style="margin-bottom: 5px;" data-i18n="unsplashApiKey">Unsplash Access Key</label>
+                        <input type="text" id="unsplash-api-key" placeholder="Client ID (Access Key)"
+                            style="margin-bottom: 10px; width: 100%;">
+                        <label style="margin-bottom: 5px;" data-i18n="searchUnsplash">Search Unsplash</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" id="unsplash-search-input" placeholder="Search..."
+                                data-i18n="searchUnsplash" style="flex:1;">
+                            <button id="unsplash-search-btn" class="secondary"
+                                style="width: auto; margin-bottom: 15px;">Go</button>
+                        </div>
+                        <div id="unsplash-results" class="hidden"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="setting-item">
-                 <label>Weather</label>
-                 <div class="setting-group">
-                     <label for="weather-enabled-check">Enable Weather</label>
-                     <input type="checkbox" id="weather-enabled-check" style="width: auto; margin:0;">
-                 </div>
-                 <div id="weather-config-container" class="hidden">
-                     <div style="margin-top: 15px;">
-                         <label for="weather-city-input" style="display:block; margin-bottom:5px;">City Name</label>
-                         <input type="text" id="weather-city-input" placeholder="e.g. London, New York">
-                     </div>
-                     <div>
-                         <label for="weather-unit-select" style="display:block; margin-bottom:5px;">Unit</label>
-                         <select id="weather-unit-select">
-                             <option value="celsius">Celsius (°C)</option>
-                             <option value="fahrenheit">Fahrenheit (°F)</option>
-                         </select>
-                     </div>
-                 </div>
+                <label>Weather</label>
+                <div class="setting-group">
+                    <label for="weather-enabled-check">Enable Weather</label>
+                    <input type="checkbox" id="weather-enabled-check" style="width: auto; margin:0;">
+                </div>
+                <div id="weather-config-container" class="hidden">
+                    <div style="margin-top: 15px;">
+                        <label for="weather-city-input" style="display:block; margin-bottom:5px;">City Name</label>
+                        <input type="text" id="weather-city-input" placeholder="e.g. London, New York">
+                    </div>
+                    <div>
+                        <label for="weather-unit-select" style="display:block; margin-bottom:5px;">Unit</label>
+                        <select id="weather-unit-select">
+                            <option value="celsius">Celsius (°C)</option>
+                            <option value="fahrenheit">Fahrenheit (°F)</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div class="setting-item">
@@ -115,8 +144,8 @@
                     <button id="export-data" class="secondary" data-i18n="exportSettings">Export Settings</button>
                 </div>
                 <div class="setting-group">
-                     <button id="import-data-btn" class="secondary" data-i18n="importSettings">Import Settings</button>
-                     <input type="file" id="import-data-input" accept=".json" class="hidden">
+                    <button id="import-data-btn" class="secondary" data-i18n="importSettings">Import Settings</button>
+                    <input type="file" id="import-data-input" accept=".json" class="hidden">
                 </div>
             </div>
         </div>
@@ -135,4 +164,5 @@
 
     <script type="module" src="js/main.js"></script>
 </body>
+
 </html>

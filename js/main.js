@@ -42,6 +42,7 @@ class App {
                 this.preferences.layout = layout;
                 this.save();
                 this.ui.applyPreferences(this.preferences);
+                this.ui.renderShortcuts(this.shortcuts);
             },
             onLanguageChange: (lang) => {
                 this.preferences.language = lang;
