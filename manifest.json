@@ -13,7 +13,8 @@
   ],
   "host_permissions": [
     "https://api.unsplash.com/*",
-    "https://images.unsplash.com/*"
+    "https://images.unsplash.com/*",
+    "https://mail.google.com/"
   ],
   "icons": {
     "16": "icon16.png",

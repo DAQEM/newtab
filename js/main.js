@@ -1,10 +1,12 @@
 /**
  * Main entry point for the extension
  */
+import { GmailService } from './gmail.js';
 import { loadData, saveData } from './storage.js';
 import { UI } from './ui.js';
 import { formatUrl } from './utils.js';
 import { Widgets } from './widgets.js';
+
 
 class App {
     constructor() {
@@ -103,11 +105,13 @@ class App {
                     this.shortcuts.push({ name, url: formattedUrl });
                 }
                 this.save();
+                this.updateGmailService();
                 this.ui.renderShortcuts(this.shortcuts);
             },
             onShortcutDelete: (index) => {
                 this.shortcuts.splice(index, 1);
                 this.save();
+                this.updateGmailService();
                 this.ui.renderShortcuts(this.shortcuts);
             },
             onUnsplashConfigChange: (updates) => {
@@ -131,6 +135,31 @@ class App {
         }
         // Pass preferences to widgets
         this.widgets.updatePreferences(this.preferences);
+
+        // Initialize Gmail Service
+        this.gmailService = new GmailService();
+
+        // Initial setup of indices
+        this.updateGmailService();
+
+        this.gmailService.startPolling((counts) => {
+            this.ui.updateGmailCount(counts);
+        });
+    }
+
+    updateGmailService() {
+        const indices = new Set();
+        this.shortcuts.forEach(s => {
+            if (s.url.includes('mail.google.com')) {
+                const match = s.url.match(/\/u\/(\d+)\//);
+                if (match) {
+                    indices.add(match[1]);
+                } else {
+                    indices.add(0); // Default if just mail.google.com
+                }
+            }
+        });
+        this.gmailService.setIndices(Array.from(indices));
     }
 
     save() {

@@ -13,6 +13,43 @@ export class UI {
         this.initLanguageSelect();
         this.initUnsplash();
         this.editingIndex = -1;
+        this.gmailCounts = {};
+    }
+
+    isGmailUrl(url) {
+        return url.includes('mail.google.com');
+    }
+
+    updateGmailCount(counts) {
+        this.gmailCounts = counts || {};
+
+        // Find all shortcut cards that link to Gmail
+        const cards = this.elements.shortcutsContainer.querySelectorAll('.shortcut-card');
+        cards.forEach(card => {
+            const url = card.getAttribute('href');
+            if (this.isGmailUrl(url)) {
+                // Determine user index
+                let index = 0;
+                const match = url.match(/\/u\/(\d+)\//);
+                if (match) {
+                    index = parseInt(match[1], 10);
+                }
+
+                // Remove existing
+                const existingBadge = card.querySelector('.shortcut-badge');
+                if (existingBadge) existingBadge.remove();
+
+                // Get count for this user
+                const count = this.gmailCounts[index];
+
+                if (count !== undefined && count > 0) {
+                    const badge = document.createElement('div');
+                    badge.className = 'shortcut-badge';
+                    badge.textContent = count > 99 ? '99+' : count;
+                    card.appendChild(badge);
+                }
+            }
+        });
     }
 
     cacheDOM() {
@@ -398,6 +435,22 @@ export class UI {
             <img src="${faviconUrl}" alt="${shortcut.name}" class="shortcut-icon" onerror="this.src='${fallbackIcon}'">
             <span class="shortcut-name">${shortcut.name}</span>
         `;
+
+        // Check for Gmail badge
+        if (this.isGmailUrl(shortcut.url)) {
+            let index = 0;
+            const match = shortcut.url.match(/\/u\/(\d+)\//);
+            if (match) index = parseInt(match[1], 10);
+
+            const count = this.gmailCounts ? this.gmailCounts[index] : null;
+
+            if (count && count > 0) {
+                const badge = document.createElement('div');
+                badge.className = 'shortcut-badge';
+                badge.textContent = count > 99 ? '99+' : count;
+                card.appendChild(badge);
+            }
+        }
 
         // Drag Events
         card.addEventListener('dragstart', (e) => this.handleDragStart(e, index));
