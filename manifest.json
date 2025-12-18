@@ -6,8 +6,9 @@
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "permissions": [
-    "storage"
+    "permissions": [
+    "storage",
+    "geolocation"
   ],
   "icons": {
     "16": "icon16.png",

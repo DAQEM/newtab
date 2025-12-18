@@ -8,6 +8,31 @@
 </head>
 <body>
     <div id="app">
+        <!-- Weather Widget -->
+        <div id="weather-widget" class="widget">
+            <span id="weather-icon"></span>
+            <span id="weather-temp">--°C</span>
+            <span id="weather-desc">Loading...</span>
+        </div>
+
+        <!-- Clock & Greeting -->
+        <div id="clock-container" class="widget">
+            <h1 id="clock">00:00</h1>
+            <h2 id="greeting">Good Morning</h2>
+        </div>
+
+        <!-- Search Bar -->
+        <div id="search-container" class="widget">
+            <form id="search-form">
+                <select id="search-engine">
+                    <option value="google">Google</option>
+                    <option value="duckduckgo">DuckDuckGo</option>
+                    <option value="bing">Bing</option>
+                </select>
+                <input type="text" id="search-input" placeholder="Search the web..." autocomplete="off">
+            </form>
+        </div>
+
         <div id="settings-trigger" title="Settings">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </div>
@@ -22,11 +47,55 @@
         <div id="settings-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
-                <h2>Settings</h2>
+                <h2 data-i18n="settings">Settings</h2>
                 
                 <div class="setting-item">
-                    <label for="bg-color-picker">Background Color</label>
-                    <input type="color" id="bg-color-picker" value="#ffffff">
+                     <label>Language</label>
+                     <select id="language-select">
+                         <!-- Languages injected by JS -->
+                     </select>
+                </div>
+
+                <div class="setting-item">
+                    <label data-i18n="background">Background</label>
+                    <div class="setting-group">
+                        <label for="bg-color-picker" data-i18n="color">Color</label>
+                        <input type="color" id="bg-color-picker" value="#1e1e1e">
+                    </div>
+                    <div class="setting-group">
+                        <label data-i18n="image">Image</label>
+                        <input type="file" id="bg-image-upload" accept="image/*">
+                        <button id="clear-bg-image" class="secondary hidden" data-i18n="removeImage">Remove Image</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <label data-i18n="theme">Theme</label>
+                    <select id="theme-select">
+                        <option value="system">System Default</option>
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label data-i18n="layout">Layout</label>
+                    <select id="layout-select">
+                        <option value="grid">Grid</option>
+                        <option value="list">List</option>
+                        <option value="minimal">Minimal</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label data-i18n="data">Data</label>
+                    <div class="setting-group">
+                        <button id="export-data" class="secondary" data-i18n="exportSettings">Export Settings</button>
+                    </div>
+                    <div class="setting-group">
+                         <button id="import-data-btn" class="secondary" data-i18n="importSettings">Import Settings</button>
+                         <input type="file" id="import-data-input" accept=".json" class="hidden">
+                    </div>
                 </div>
             </div>
         </div>
@@ -34,14 +103,14 @@
         <div id="shortcut-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
-                <h2 id="shortcut-modal-title">Add Shortcut</h2>
-                <input type="text" id="shortcut-name" placeholder="Name (e.g., YouTube)">
-                <input type="url" id="shortcut-url" placeholder="URL (e.g., https://youtube.com)">
-                <button id="save-shortcut">Save</button>
-                <button id="delete-shortcut" class="hidden danger">Delete</button>
+                <h2 id="shortcut-modal-title" data-i18n="addShortcut">Add Shortcut</h2>
+                <input type="text" id="shortcut-name" placeholder="Name">
+                <input type="url" id="shortcut-url" placeholder="URL">
+                <button id="save-shortcut" data-i18n="save">Save</button>
+                <button id="delete-shortcut" class="hidden danger" data-i18n="delete">Delete</button>
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
