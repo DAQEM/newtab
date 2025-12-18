@@ -35,7 +35,7 @@ class App {
             onBgImageChange: (dataUrl) => {
                 this.preferences.bgImage = dataUrl;
                 // No sync for large image, storage module handles this check.
-                 this.save();
+                this.save();
                 this.ui.applyPreferences(this.preferences);
             },
             onLayoutChange: (layout) => {
@@ -109,14 +109,20 @@ class App {
                 this.shortcuts.splice(index, 1);
                 this.save();
                 this.ui.renderShortcuts(this.shortcuts);
-            }
+            },
+            onUnsplashConfigChange: (updates) => {
+                // Merge the updates (bgAttribution or unsplashClientId) into preferences
+                this.preferences = { ...this.preferences, ...updates };
+                this.save();
+                this.ui.applyPreferences(this.preferences);
+            },
         });
 
         // Initialize Widgets
         this.widgets = new Widgets({});
-        
 
-        
+
+
         // Initial Render
         this.ui.renderShortcuts(this.shortcuts);
         this.ui.applyPreferences(this.preferences);

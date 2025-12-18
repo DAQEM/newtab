@@ -51,27 +51,27 @@ export class UI {
     }
 
     bindEvents() {
-        const { 
-            settingsTrigger, 
-            addShortcutBtn, 
-            closeModals, 
-            bgColorPicker, 
-            saveShortcutBtn, 
-            deleteShortcutBtn 
+        const {
+            settingsTrigger,
+            addShortcutBtn,
+            closeModals,
+            bgColorPicker,
+            saveShortcutBtn,
+            deleteShortcutBtn
         } = this.elements;
 
         const shortcutsContainer = this.elements.shortcutsContainer;
-        
+
         // Scroll listener for pagination dots
         shortcutsContainer.addEventListener('scroll', () => {
-             // Only relevant for grid layout with slides
-             if (this.elements.layoutSelect.value === 'grid') {
-                 const width = shortcutsContainer.clientWidth;
-                 if (width > 0) {
-                     const page = Math.round(shortcutsContainer.scrollLeft / width);
-                     this.updateActiveDot(page);
-                 }
-             }
+            // Only relevant for grid layout with slides
+            if (this.elements.layoutSelect.value === 'grid') {
+                const width = shortcutsContainer.clientWidth;
+                if (width > 0) {
+                    const page = Math.round(shortcutsContainer.scrollLeft / width);
+                    this.updateActiveDot(page);
+                }
+            }
         });
 
         settingsTrigger.addEventListener('click', () => this.openModal(this.elements.settingsModal));
@@ -79,8 +79,8 @@ export class UI {
             e.stopPropagation();
             this.openShortcutModal();
         });
-        
-        closeModals.forEach(btn => 
+
+        closeModals.forEach(btn =>
             btn.addEventListener('click', (e) => this.closeModal(e.target.closest('.modal')))
         );
 
@@ -103,6 +103,12 @@ export class UI {
             if (file && this.callbacks.onBgImageChange) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
+                    // 1. Remove attribution (since it's now a local file, not Unsplash)
+                    if (this.callbacks.onUnsplashConfigChange) {
+                        this.callbacks.onUnsplashConfigChange({ bgAttribution: null });
+                    }
+
+                    // 2. Set the image
                     this.callbacks.onBgImageChange(event.target.result);
                 };
                 reader.readAsDataURL(file);
@@ -111,8 +117,15 @@ export class UI {
 
         clearBgImageBtn.addEventListener('click', () => {
             if (this.callbacks.onBgImageChange) {
+                // 1. Remove the image
                 this.callbacks.onBgImageChange(null);
-                bgImageUpload.value = ''; // Reset input
+
+                // 2. Remove the attribution
+                if (this.callbacks.onUnsplashConfigChange) {
+                    this.callbacks.onUnsplashConfigChange({ bgAttribution: null });
+                }
+
+                bgImageUpload.value = '';
             }
         });
 
@@ -123,9 +136,9 @@ export class UI {
         });
 
         layoutSelect.addEventListener('change', (e) => {
-           if (this.callbacks.onLayoutChange) {
-               this.callbacks.onLayoutChange(e.target.value);
-           }
+            if (this.callbacks.onLayoutChange) {
+                this.callbacks.onLayoutChange(e.target.value);
+            }
         });
 
         languageSelect.addEventListener('change', (e) => {
@@ -151,18 +164,18 @@ export class UI {
             if (file && this.callbacks.onImportData) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                     try {
-                         const data = JSON.parse(event.target.result);
-                         this.callbacks.onImportData(data);
-                     } catch (err) {
-                         alert('Invalid JSON file');
-                     }
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        this.callbacks.onImportData(data);
+                    } catch (err) {
+                        alert('Invalid JSON file');
+                    }
                 };
                 reader.readAsText(file);
             }
             e.target.value = ''; // Reset
         });
-        
+
         // Save on modal close or specific events? For now we rely on explicit changes calls
         // But we might want to trigger a general save when settings modal closes
         // However, Main.js saves on callbacks, so it should be fine.
@@ -177,28 +190,28 @@ export class UI {
         const weatherUnitSelect = document.getElementById('weather-unit-select');
 
         weatherEnabledCheck.addEventListener('change', (e) => {
-             const enabled = e.target.checked;
-             if (enabled) {
-                 weatherConfigContainer.classList.remove('hidden');
-             } else {
-                 weatherConfigContainer.classList.add('hidden');
-             }
-             if (this.callbacks.onWeatherConfigChange) {
-                 this.callbacks.onWeatherConfigChange({ enabled: enabled });
-             }
+            const enabled = e.target.checked;
+            if (enabled) {
+                weatherConfigContainer.classList.remove('hidden');
+            } else {
+                weatherConfigContainer.classList.add('hidden');
+            }
+            if (this.callbacks.onWeatherConfigChange) {
+                this.callbacks.onWeatherConfigChange({ enabled: enabled });
+            }
         });
 
         // Debounce map/save would be better, but change is fine for MVP input
         weatherCityInput.addEventListener('change', (e) => {
-             if (this.callbacks.onWeatherConfigChange) {
-                 this.callbacks.onWeatherConfigChange({ city: e.target.value });
-             }
+            if (this.callbacks.onWeatherConfigChange) {
+                this.callbacks.onWeatherConfigChange({ city: e.target.value });
+            }
         });
-        
+
         weatherUnitSelect.addEventListener('change', (e) => {
-             if (this.callbacks.onWeatherConfigChange) {
-                 this.callbacks.onWeatherConfigChange({ unit: e.target.value });
-             }
+            if (this.callbacks.onWeatherConfigChange) {
+                this.callbacks.onWeatherConfigChange({ unit: e.target.value });
+            }
         });
     }
 
@@ -230,7 +243,7 @@ export class UI {
         // For simplicity, read input. If empty, warn.
         const clientId = this.elements.unsplashApiKeyInput.value.trim();
         const t = translations[this.currentLang || 'en'];
-        
+
         if (!clientId) {
             alert(t.setApiKeyFirst || 'Please set API Key');
             return;
@@ -247,7 +260,7 @@ export class UI {
             });
 
             if (!res.ok) throw new Error(res.statusText);
-            
+
             const data = await res.json();
             this.renderUnsplashResults(data.results);
         } catch (err) {
@@ -272,13 +285,12 @@ export class UI {
             img.className = 'unsplash-thumb';
             img.title = `Photo by ${photo.user.name}`;
             img.addEventListener('click', () => {
-                // Select this photo
+                // 1. Update the background image URL
                 if (this.callbacks.onBgImageChange) {
-                    // Use regular or full URL
                     this.callbacks.onBgImageChange(photo.urls.regular);
                 }
-                
-                // Set attribution
+
+                // 2. Update the attribution details
                 if (this.callbacks.onUnsplashConfigChange) {
                     this.callbacks.onUnsplashConfigChange({
                         bgAttribution: {
@@ -289,8 +301,7 @@ export class UI {
                     });
                 }
 
-                // Trigger download endpoint as required by API
-                // We fire and forget
+                // 3. Trigger Unsplash download tracking
                 const clientId = this.elements.unsplashApiKeyInput.value.trim();
                 if (clientId && photo.links.download_location) {
                     fetch(photo.links.download_location, {
@@ -307,61 +318,61 @@ export class UI {
         // Clear container
         this.elements.shortcutsContainer.innerHTML = '';
         this.elements.paginationDots.innerHTML = '';
-        
+
         const layout = this.elements.layoutSelect.value || 'grid';
 
         if (layout === 'grid') {
-             // Pagination Logic: 10 items per page (5x2)
-             const itemsPerPage = 10;
-             let totalItems = shortcuts.length + 1; // +1 for Add Button
-             let numPages = Math.ceil(totalItems / itemsPerPage);
-             if (numPages < 1) numPages = 1;
+            // Pagination Logic: 10 items per page (5x2)
+            const itemsPerPage = 10;
+            let totalItems = shortcuts.length + 1; // +1 for Add Button
+            let numPages = Math.ceil(totalItems / itemsPerPage);
+            if (numPages < 1) numPages = 1;
 
-             for (let i = 0; i < numPages; i++) {
-                 // Create Slide
-                 const slide = document.createElement('div');
-                 slide.className = 'shortcut-slide';
-                 
-                 const start = i * itemsPerPage;
-                 const end = start + itemsPerPage;
-                 const pageShortcuts = shortcuts.slice(start, end);
-                 
-                 pageShortcuts.forEach((shortcut, idx) => {
-                     const absIndex = start + idx;
-                     const card = this.createShortcutCard(shortcut, absIndex);
-                     slide.appendChild(card);
-                 });
+            for (let i = 0; i < numPages; i++) {
+                // Create Slide
+                const slide = document.createElement('div');
+                slide.className = 'shortcut-slide';
 
-                 // Append Add Button to last page/slot
-                 if (slide.children.length < itemsPerPage) {
-                     slide.appendChild(this.elements.addShortcutBtn);
-                     this.elements.addShortcutBtn.style.display = 'flex'; 
-                 }
-                 this.elements.shortcutsContainer.appendChild(slide);
+                const start = i * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pageShortcuts = shortcuts.slice(start, end);
 
-                 // Create Dot only if multiple pages
-                 if (numPages > 1) {
-                     const dot = document.createElement('div');
-                     dot.className = 'pagination-dot';
-                     if (i === 0) dot.classList.add('active');
-                     dot.addEventListener('click', () => {
-                         this.elements.shortcutsContainer.scrollTo({
-                             left: i * this.elements.shortcutsContainer.clientWidth,
-                             behavior: 'smooth'
-                         });
-                     });
-                     this.elements.paginationDots.appendChild(dot);
-                 }
-             }
+                pageShortcuts.forEach((shortcut, idx) => {
+                    const absIndex = start + idx;
+                    const card = this.createShortcutCard(shortcut, absIndex);
+                    slide.appendChild(card);
+                });
+
+                // Append Add Button to last page/slot
+                if (slide.children.length < itemsPerPage) {
+                    slide.appendChild(this.elements.addShortcutBtn);
+                    this.elements.addShortcutBtn.style.display = 'flex';
+                }
+                this.elements.shortcutsContainer.appendChild(slide);
+
+                // Create Dot only if multiple pages
+                if (numPages > 1) {
+                    const dot = document.createElement('div');
+                    dot.className = 'pagination-dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => {
+                        this.elements.shortcutsContainer.scrollTo({
+                            left: i * this.elements.shortcutsContainer.clientWidth,
+                            behavior: 'smooth'
+                        });
+                    });
+                    this.elements.paginationDots.appendChild(dot);
+                }
+            }
 
         } else {
-             // List Layout
-             shortcuts.forEach((shortcut, index) => {
-                 const card = this.createShortcutCard(shortcut, index);
-                 this.elements.shortcutsContainer.appendChild(card);
-             });
-             this.elements.shortcutsContainer.appendChild(this.elements.addShortcutBtn);
-             this.elements.addShortcutBtn.style.display = 'flex';
+            // List Layout
+            shortcuts.forEach((shortcut, index) => {
+                const card = this.createShortcutCard(shortcut, index);
+                this.elements.shortcutsContainer.appendChild(card);
+            });
+            this.elements.shortcutsContainer.appendChild(this.elements.addShortcutBtn);
+            this.elements.addShortcutBtn.style.display = 'flex';
         }
     }
 
@@ -379,7 +390,7 @@ export class UI {
         card.href = shortcut.url;
         card.draggable = true;
         card.dataset.index = index;
-        
+
         const faviconUrl = getFaviconUrl(shortcut.url);
         const fallbackIcon = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PGxpbmUgeDE9IjEyIiB5MT0iOCIgeDI9IjEyIiB5Mj0iMTYiPjwvbGluZT48bGluZSB4MT0iOCIgeTE9IjEyIiB4Mj0iMTYiIHkyPSIxMiI+PC9saW5lPjwvc3ZnPg==';
 
@@ -393,7 +404,7 @@ export class UI {
         card.addEventListener('dragover', (e) => this.handleDragOver(e));
         card.addEventListener('drop', (e) => this.handleDrop(e, index));
         card.addEventListener('dragend', (e) => this.handleDragEnd(e));
-        
+
         // Context Menu
         card.addEventListener('contextmenu', (e) => this.handleContextMenu(e, index, shortcut));
         return card;
@@ -436,20 +447,20 @@ export class UI {
 
         // Hide when clicking elsewhere
         window.addEventListener('click', () => this.contextMenu.classList.add('hidden'));
-        
+
         // Bind actions
         this.contextMenu.querySelector('#ctx-edit').addEventListener('click', () => {
             if (this.ctxTargetIndex !== -1) {
                 this.openShortcutModal(this.ctxTargetIndex, this.ctxTargetShortcut);
             }
         });
-        
+
         this.contextMenu.querySelector('#ctx-delete').addEventListener('click', () => {
             if (this.ctxTargetIndex !== -1) {
                 const lang = this.currentLang || 'en';
                 const t = translations[lang];
                 if (confirm(t.confirmDelete)) {
-                     if (this.callbacks.onShortcutDelete) {
+                    if (this.callbacks.onShortcutDelete) {
                         this.callbacks.onShortcutDelete(this.ctxTargetIndex);
                     }
                 }
@@ -461,7 +472,7 @@ export class UI {
         e.preventDefault();
         this.ctxTargetIndex = index;
         this.ctxTargetShortcut = shortcut;
-        
+
         this.contextMenu.style.top = `${e.clientY}px`;
         this.contextMenu.style.left = `${e.clientX}px`;
         this.contextMenu.classList.remove('hidden');
@@ -495,11 +506,11 @@ export class UI {
             this.elements.bgAttribution.classList.add('hidden');
             this.elements.bgAttribution.innerHTML = '';
         }
-        
+
         if (preferences.unsplashClientId) {
             this.elements.unsplashApiKeyInput.value = preferences.unsplashClientId;
         }
-        
+
         this.elements.bgColorPicker.value = preferences.bgColor;
 
         // Theme
@@ -507,9 +518,9 @@ export class UI {
         if (preferences.theme === 'light') {
             document.body.classList.add('light-theme');
         } else if (preferences.theme === 'system') {
-             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-                 document.body.classList.add('light-theme');
-             }
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                document.body.classList.add('light-theme');
+            }
         }
         this.elements.themeSelect.value = preferences.theme;
 
@@ -523,14 +534,14 @@ export class UI {
             this.currentLang = preferences.language;
             this.applyLanguage(preferences.language);
         }
-        
+
         // Weather
         if (preferences.weatherEnabled) {
             document.getElementById('weather-enabled-check').checked = true;
             document.getElementById('weather-config-container').classList.remove('hidden');
         } else {
-             document.getElementById('weather-enabled-check').checked = false;
-             document.getElementById('weather-config-container').classList.add('hidden');
+            document.getElementById('weather-enabled-check').checked = false;
+            document.getElementById('weather-config-container').classList.add('hidden');
         }
 
         if (preferences.weatherCity) {
@@ -586,12 +597,12 @@ export class UI {
     updateContextMenu(lang) {
         if (!translations[lang]) lang = 'en';
         const t = translations[lang];
-        
+
         // We assume context menu has 2 children: edit and delete
         // See setupContextMenu for structure: #ctx-edit, #ctx-delete
         const editBtn = this.contextMenu.querySelector('#ctx-edit');
         const deleteBtn = this.contextMenu.querySelector('#ctx-delete');
-        
+
         if (editBtn) editBtn.textContent = t.edit;
         if (deleteBtn) deleteBtn.textContent = t.delete;
     }
