@@ -22,22 +22,21 @@ class App {
 
         // Initialize UI with callbacks
         this.ui = new UI({
+            onThemeChange: (theme) => {
+                this.preferences.theme = theme;
+                this.save();
+                this.ui.applyPreferences(this.preferences);
+            },
             onBgColorChange: (color) => {
                 this.preferences.bgColor = color;
-                // Clear image if color is explicitly set (optional UX choice)
-                // this.preferences.bgImage = null; 
-                this.ui.applyPreferences(this.preferences);
                 this.save();
+                this.ui.applyPreferences(this.preferences);
             },
             onBgImageChange: (dataUrl) => {
                 this.preferences.bgImage = dataUrl;
+                // No sync for large image, storage module handles this check.
+                 this.save();
                 this.ui.applyPreferences(this.preferences);
-                this.save();
-            },
-            onThemeChange: (theme) => {
-                this.preferences.theme = theme;
-                this.ui.applyPreferences(this.preferences);
-                this.save();
             },
             onLayoutChange: (layout) => {
                 this.preferences.layout = layout;
@@ -49,6 +48,13 @@ class App {
                 this.save();
                 this.ui.applyPreferences(this.preferences);
                 this.widgets.updateLanguage(lang);
+            },
+            onWeatherConfigChange: (updates) => {
+                if ('enabled' in updates) this.preferences.weatherEnabled = updates.enabled;
+                if ('city' in updates) this.preferences.weatherCity = updates.city;
+                if ('unit' in updates) this.preferences.weatherUnit = updates.unit;
+                this.save();
+                this.widgets.updatePreferences(this.preferences);
             },
             onShortcutReorder: (fromIndex, toIndex) => {
                 const [moved] = this.shortcuts.splice(fromIndex, 1);
@@ -106,14 +112,18 @@ class App {
         });
 
         // Initialize Widgets
-        this.widgets = new Widgets();
+        this.widgets = new Widgets({});
+        
 
+        
         // Initial Render
         this.ui.renderShortcuts(this.shortcuts);
         this.ui.applyPreferences(this.preferences);
         if (this.preferences.language) {
             this.widgets.updateLanguage(this.preferences.language);
         }
+        // Pass preferences to widgets
+        this.widgets.updatePreferences(this.preferences);
     }
 
     save() {

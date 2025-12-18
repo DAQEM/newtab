@@ -51,7 +51,10 @@ export class UI {
         } = this.elements;
 
         settingsTrigger.addEventListener('click', () => this.openModal(this.elements.settingsModal));
-        addShortcutBtn.addEventListener('click', () => this.openShortcutModal());
+        addShortcutBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.openShortcutModal();
+        });
         
         closeModals.forEach(btn => 
             btn.addEventListener('click', (e) => this.closeModal(e.target.closest('.modal')))
@@ -142,6 +145,37 @@ export class UI {
 
         saveShortcutBtn.addEventListener('click', () => this.handleSaveShortcut());
         deleteShortcutBtn.addEventListener('click', () => this.handleDeleteShortcut());
+
+        // Weather Settings
+        const weatherEnabledCheck = document.getElementById('weather-enabled-check');
+        const weatherConfigContainer = document.getElementById('weather-config-container');
+        const weatherCityInput = document.getElementById('weather-city-input');
+        const weatherUnitSelect = document.getElementById('weather-unit-select');
+
+        weatherEnabledCheck.addEventListener('change', (e) => {
+             const enabled = e.target.checked;
+             if (enabled) {
+                 weatherConfigContainer.classList.remove('hidden');
+             } else {
+                 weatherConfigContainer.classList.add('hidden');
+             }
+             if (this.callbacks.onWeatherConfigChange) {
+                 this.callbacks.onWeatherConfigChange({ enabled: enabled });
+             }
+        });
+
+        // Debounce map/save would be better, but change is fine for MVP input
+        weatherCityInput.addEventListener('change', (e) => {
+             if (this.callbacks.onWeatherConfigChange) {
+                 this.callbacks.onWeatherConfigChange({ city: e.target.value });
+             }
+        });
+        
+        weatherUnitSelect.addEventListener('change', (e) => {
+             if (this.callbacks.onWeatherConfigChange) {
+                 this.callbacks.onWeatherConfigChange({ unit: e.target.value });
+             }
+        });
     }
 
 
@@ -281,6 +315,22 @@ export class UI {
             this.currentLang = preferences.language;
             this.applyLanguage(preferences.language);
         }
+        
+        // Weather
+        if (preferences.weatherEnabled) {
+            document.getElementById('weather-enabled-check').checked = true;
+            document.getElementById('weather-config-container').classList.remove('hidden');
+        } else {
+             document.getElementById('weather-enabled-check').checked = false;
+             document.getElementById('weather-config-container').classList.add('hidden');
+        }
+
+        if (preferences.weatherCity) {
+            document.getElementById('weather-city-input').value = preferences.weatherCity;
+        }
+        if (preferences.weatherUnit) {
+            document.getElementById('weather-unit-select').value = preferences.weatherUnit;
+        }
     }
 
     initLanguageSelect() {
@@ -350,17 +400,20 @@ export class UI {
         this.editingIndex = index;
         const { shortcutNameInput, shortcutUrlInput, shortcutModalTitle, deleteShortcutBtn, shortcutModal } = this.elements;
 
+        const lang = this.currentLang || 'en';
+        const t = translations[lang] || translations['en'];
+
         if (index >= 0 && shortcut) {
             shortcutNameInput.value = shortcut.name;
             shortcutUrlInput.value = shortcut.url;
             shortcutModalTitle.setAttribute('data-i18n', 'editShortcut');
-            shortcutModalTitle.textContent = translations[this.currentLang || 'en'].editShortcut;
+            shortcutModalTitle.textContent = t.editShortcut;
             deleteShortcutBtn.classList.remove('hidden');
         } else {
             shortcutNameInput.value = '';
             shortcutUrlInput.value = '';
             shortcutModalTitle.setAttribute('data-i18n', 'addShortcut');
-            shortcutModalTitle.textContent = translations[this.currentLang || 'en'].addShortcut;
+            shortcutModalTitle.textContent = t.addShortcut;
             deleteShortcutBtn.classList.add('hidden');
         }
         this.openModal(shortcutModal);

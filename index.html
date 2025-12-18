@@ -39,78 +39,100 @@
 
         <div id="shortcuts-container">
             <!-- Shortcuts will be injected here -->
-            <button id="add-shortcut-btn">
+            <button id="add-shortcut-btn" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
         </div>
+    </div>
 
-        <div id="settings-modal" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2 data-i18n="settings">Settings</h2>
-                
-                <div class="setting-item">
-                     <label>Language</label>
-                     <select id="language-select">
-                         <!-- Languages injected by JS -->
-                     </select>
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="settings">Settings</h2>
+            
+            <div class="setting-item">
+                 <label>Language</label>
+                 <select id="language-select">
+                     <!-- Languages injected by JS -->
+                 </select>
+            </div>
+
+            <div class="setting-item">
+                <label data-i18n="background">Background</label>
+                <div class="setting-group">
+                    <label for="bg-color-picker" data-i18n="color">Color</label>
+                    <input type="color" id="bg-color-picker" value="#1e1e1e">
                 </div>
-
-                <div class="setting-item">
-                    <label data-i18n="background">Background</label>
-                    <div class="setting-group">
-                        <label for="bg-color-picker" data-i18n="color">Color</label>
-                        <input type="color" id="bg-color-picker" value="#1e1e1e">
-                    </div>
-                    <div class="setting-group">
-                        <label data-i18n="image">Image</label>
-                        <input type="file" id="bg-image-upload" accept="image/*">
-                        <button id="clear-bg-image" class="secondary hidden" data-i18n="removeImage">Remove Image</button>
-                    </div>
-                </div>
-
-                <div class="setting-item">
-                    <label data-i18n="theme">Theme</label>
-                    <select id="theme-select">
-                        <option value="system">System Default</option>
-                        <option value="dark">Dark</option>
-                        <option value="light">Light</option>
-                    </select>
-                </div>
-
-                <div class="setting-item">
-                    <label data-i18n="layout">Layout</label>
-                    <select id="layout-select">
-                        <option value="grid">Grid</option>
-                        <option value="list">List</option>
-                        <option value="minimal">Minimal</option>
-                    </select>
-                </div>
-
-                <div class="setting-item">
-                    <label data-i18n="data">Data</label>
-                    <div class="setting-group">
-                        <button id="export-data" class="secondary" data-i18n="exportSettings">Export Settings</button>
-                    </div>
-                    <div class="setting-group">
-                         <button id="import-data-btn" class="secondary" data-i18n="importSettings">Import Settings</button>
-                         <input type="file" id="import-data-input" accept=".json" class="hidden">
-                    </div>
+                <div>
+                    <label data-i18n="image">Image</label>
+                    <input type="file" id="bg-image-upload" accept="image/*">
+                    <button id="clear-bg-image" class="secondary hidden" data-i18n="removeImage">Remove Image</button>
                 </div>
             </div>
-        </div>
 
-        <div id="shortcut-modal" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2 id="shortcut-modal-title" data-i18n="addShortcut">Add Shortcut</h2>
-                <input type="text" id="shortcut-name" placeholder="Name">
-                <input type="url" id="shortcut-url" placeholder="URL">
-                <button id="save-shortcut" data-i18n="save">Save</button>
-                <button id="delete-shortcut" class="hidden danger" data-i18n="delete">Delete</button>
+            <div class="setting-item">
+                 <label>Weather</label>
+                 <div class="setting-group">
+                     <label for="weather-enabled-check">Enable Weather</label>
+                     <input type="checkbox" id="weather-enabled-check" style="width: auto; margin:0;">
+                 </div>
+                 <div id="weather-config-container" class="hidden">
+                     <div style="margin-top: 15px;">
+                         <label for="weather-city-input" style="display:block; margin-bottom:5px;">City Name</label>
+                         <input type="text" id="weather-city-input" placeholder="e.g. London, New York">
+                     </div>
+                     <div>
+                         <label for="weather-unit-select" style="display:block; margin-bottom:5px;">Unit</label>
+                         <select id="weather-unit-select">
+                             <option value="celsius">Celsius (°C)</option>
+                             <option value="fahrenheit">Fahrenheit (°F)</option>
+                         </select>
+                     </div>
+                 </div>
+            </div>
+
+            <div class="setting-item">
+                <label data-i18n="theme">Theme</label>
+                <select id="theme-select">
+                    <option value="system">System Default</option>
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <label data-i18n="layout">Layout</label>
+                <select id="layout-select">
+                    <option value="grid">Grid</option>
+                    <option value="list">List</option>
+                    <option value="minimal">Minimal</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <label data-i18n="data">Data</label>
+                <div class="setting-group">
+                    <button id="export-data" class="secondary" data-i18n="exportSettings">Export Settings</button>
+                </div>
+                <div class="setting-group">
+                     <button id="import-data-btn" class="secondary" data-i18n="importSettings">Import Settings</button>
+                     <input type="file" id="import-data-input" accept=".json" class="hidden">
+                </div>
             </div>
         </div>
     </div>
+
+    <div id="shortcut-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="shortcut-modal-title" data-i18n="addShortcut">Add Shortcut</h2>
+            <input type="text" id="shortcut-name" placeholder="Name">
+            <input type="url" id="shortcut-url" placeholder="URL">
+            <button id="save-shortcut" data-i18n="save">Save</button>
+            <button id="delete-shortcut" class="hidden danger" data-i18n="delete">Delete</button>
+        </div>
+    </div>
+
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -5,14 +5,17 @@
 import { translations } from './translations.js';
 
 export class Widgets {
-    constructor() {
+    constructor(callbacks) {
+        this.callbacks = callbacks || {};
         this.currentLang = 'en';
+        this.preferences = {};
         this.dom = {
             clock: document.getElementById('clock'),
             greeting: document.getElementById('greeting'),
             weatherWidget: document.getElementById('weather-widget'),
             weatherDesc: document.getElementById('weather-desc'),
             weatherTemp: document.getElementById('weather-temp'),
+            weatherIcon: document.getElementById('weather-icon'),
             searchForm: document.getElementById('search-form'),
             searchInput: document.getElementById('search-input'),
             searchEngine: document.getElementById('search-engine')
@@ -24,7 +27,12 @@ export class Widgets {
     init() {
         this.startClock();
         this.setupSearch();
-        this.fetchWeather();
+        // Weather fetch is deferred until preferences are applied
+    }
+
+    updatePreferences(preferences) {
+        this.preferences = preferences;
+        this.refreshWeather();
     }
 
     updateLanguage(lang) {
@@ -91,46 +99,70 @@ export class Widgets {
         });
     }
 
-    fetchWeather() {
-        // Privacy-focused: No precise location, use IP-based estimate via Open-Meteo or similar if available.
-        // For strictly client-side without API keys, Open-Meteo requires Lat/Lon.
-        // We can use a free IP-to-Geo service like ipapi.co (might have rate limits) or just ask user.
-        // To be safe and keep it simple for MVP, we'll try to get generic location from browser or default to a safe value.
-        // Actually, let's use a very simple approach: `navigator.geolocation` if user permits.
+
+    refreshWeather() {
+        const { weatherEnabled, weatherCity, weatherUnit } = this.preferences;
         
-        if (!navigator.geolocation) {
-            this.dom.weatherWidget.classList.add('hidden');
-            return;
+        if (!weatherEnabled) {
+             this.dom.weatherWidget.classList.add('hidden');
+             return;
         }
 
+        this.dom.weatherWidget.classList.remove('hidden');
+        this.dom.weatherDesc.textContent = 'Loading...';
+
+        if (weatherCity) {
+            this.fetchWeatherByCity(weatherCity);
+        } else {
+            this.fetchWeatherByGeo();
+        }
+    }
+
+    fetchWeatherByGeo() {
+        if (!navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                const { latitude, longitude } = position.coords;
-                this.getWeather(latitude, longitude);
+                this.getWeather(position.coords.latitude, position.coords.longitude);
             },
             (error) => {
                 console.error('Geolocation error:', error);
-                const t = translations[this.currentLang] || translations['en'];
-                let msg = t.weatherError;
-                // We're hiding it now anyway on error as per user request
-                this.dom.weatherWidget.classList.add('hidden');
+                // Fallback or error state
+                this.dom.weatherDesc.textContent = 'Loc Error';
+                 this.dom.weatherWidget.classList.remove('hidden');
             }
         );
     }
 
+    async fetchWeatherByCity(city) {
+        try {
+            const resp = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`);
+            const data = await resp.json();
+            if (data.results && data.results.length > 0) {
+                const { latitude, longitude } = data.results[0];
+                this.getWeather(latitude, longitude);
+            } else {
+                this.dom.weatherDesc.textContent = 'City not found';
+            }
+        } catch (e) {
+            this.dom.weatherDesc.textContent = 'Error';
+        }
+    }
+
     async getWeather(lat, lon) {
         try {
-            const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            const unit = this.preferences.weatherUnit === 'fahrenheit' ? '&temperature_unit=fahrenheit' : '';
+            const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true${unit}`);
             const data = await response.json();
             
             if (data.current_weather) {
                 const { temperature, weathercode } = data.current_weather;
-                this.dom.weatherTemp.textContent = `${temperature}°C`;
+                const unitSymbol = this.preferences.weatherUnit === 'fahrenheit' ? '°F' : '°C';
+                this.dom.weatherTemp.textContent = `${temperature}${unitSymbol}`;
                 this.dom.weatherDesc.textContent = this.getWeatherDesc(weathercode);
             }
         } catch (e) {
             console.error('Weather fetch failed', e);
-            this.dom.weatherWidget.classList.add('hidden');
+            this.dom.weatherDesc.textContent = 'Error';
         }
     }
 
