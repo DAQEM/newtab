@@ -287,7 +287,7 @@ export class UI {
             img.addEventListener('click', () => {
                 // 1. Update the background image URL
                 if (this.callbacks.onBgImageChange) {
-                    this.callbacks.onBgImageChange(photo.urls.regular);
+                    this.callbacks.onBgImageChange(photo.urls.full);
                 }
 
                 // 2. Update the attribution details
